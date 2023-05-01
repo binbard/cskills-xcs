@@ -52,6 +52,14 @@
             document.querySelector('#qna-list').innerHTML = '';
         });
 
+        socket.on('clear all', () => {
+            document.querySelector('html').innerHTML = '';
+        });
+
+        socket.on('clear del all', () => {
+            document.querySelector('html').innerHTML = '';
+        });
+
         document.querySelector('#qna-form #name').addEventListener('input', (event) => {
             if (event.target.value === '!') {
                 socket.emit('clear qna');
