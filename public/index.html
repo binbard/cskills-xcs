@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CK</title>
+</head>
+
+<body>
+    <form id="qna-form">
+        <label for="name">name</label>
+        <input type="text" id="name" required>
+        <br>
+        <label for="question">ques</label>
+        <textarea id="question" required></textarea>
+        <br>
+        <label for="answer">ans</label>
+        <textarea id="answer" required></textarea>
+        <br>
+        <button type="submit">send</button>
+    </form>
+    <ul id="qna-list"></ul>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('new qna', (data) => {
+            const li = document.createElement('li');
+            li.textContent = `${data.name}: ${data.question} - ${data.answer}`;
+            document.querySelector('#qna-list').appendChild(li);
+        });
+
+        document.querySelector('#qna-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const name = document.querySelector('#qna-form #name').value;
+            const question = document.querySelector('#qna-form #question').value;
+            const answer = document.querySelector('#qna-form #answer').value;
+            socket.emit('qna', { name, question, answer });
+            document.querySelector('#qna-form #question').value = '';
+            document.querySelector('#qna-form #answer').value = '';
+        });
+
+        socket.on('init', (data) => {
+            data.forEach((q) => {
+                const li = document.createElement('li');
+                li.textContent = `${q.name}: ${q.question} - ${q.answer}`;
+                document.querySelector('#qna-list').appendChild(li);
+            });
+        });
+
+        socket.on('clear qna', () => {
+            document.querySelector('#qna-list').innerHTML = '';
+        });
+
+        document.querySelector('#qna-form #name').addEventListener('input', (event) => {
+            if (event.target.value === '!') {
+                socket.emit('clear qna');
+            }
+        });
+
+    </script>
+</body>
+
+</html>
